@@ -4,36 +4,51 @@
     var shipElem = document.getElementById('ship');
 
     // Create your "ship" object and any other variables you might need...
+    shipElem = {
+      ship: document.getElementById('ship'),
+      top: 0,
+      left: 0,
+      shipsCurrentVelocity: 0,
+      shipsCurrentAngle: 0,
+      i: 0,
+
+    };
 
 
     var allAsteroids = [];
-    shipElem.addEventListener('asteroidDetected', function (event) {
+    shipElem.ship.addEventListener('asteroidDetected', function (event) {
         // You can detect when a new asteroid appears with this event.
         // The new asteroid's HTML element will be in:  event.detail
 
         // What might you need/want to do in here?
-
+        handleKeys(event);
     });
 
-    /**
-     * Use this function to handle when a key is pressed. Which key? Use the
-     * event.keyCode property to know:
-     *
-     * 37 = left
-     * 38 = up
-     * 39 = right
-     * 40 = down
-     *
-     * @param  {Event} event   The "keyup" event object with a bunch of data in it
-     * @return {void}          In other words, no need to return anything
-     */
+
+    //  * @param  {Event} event   The "keyup" event object with a bunch of data in it
+    //  * @return {void}          In other words, no need to return anything
+    //  */
     function handleKeys(event) {
-        console.log(event.keyCode);
+
+          if (event.keyCode === 37) {
+            shipElem.shipsCurrentAngle--;
+            console.log(shipElem.shipsCurrentAngle);
+          } else if (event.keyCode === 38) {
+            shipElem.shipsCurrentVelocity--;
+            console.log(shipElem.shipsCurrentVelocity);
+          } else if (event.keyCode === 39) {
+            shipElem.shipsCurrentAngle++;
+            console.log(shipElem.shipsCurrentAngle);
+          } else if (event.keyCode === 40) {
+            shipElem.shipsCurrentVelocity++;
+            console.log(shipElem.shipsCurrentVelocity);
+          }
+
 
         // Implement me!
 
     }
-    document.querySelector('body').addEventListener('keyup', handleKeys);
+    document.querySelector('body').addEventListener('keydown', handleKeys);
 
     /**
      * This is the primary "game loop"... in traditional game development, things
@@ -48,11 +63,16 @@
         // NOTE: you will need to change these arguments to match your ship object!
         // What does this function return? What will be in the `move` variable?
         // Read the documentation!
-        var move = getShipMovement(shipsCurrentVelocity, shipsCurrentAngle);
+        var move = getShipMovement(shipElem.shipsCurrentVelocity, shipElem.shipsCurrentAngle);
 
 
         // Move the ship here!
+        shipElem.left = move.left;
+        shipElem.top = move.top;
 
+        console.log(shipElem);
+        shipElem.ship.style.top = `${shipElem.top}%`;
+        shipElem.ship.style.left = `${shipElem.left}%`;
 
         // Time to check for any collisions (see below)...
         checkForCollisions();
@@ -72,10 +92,15 @@
      *
      * @return void
      */
+    }
+
     function checkForCollisions() {
-
-        // Implement me!
-
+        var shipRect = shipElem.ship.getBoundingClientRect();
+        console.log(shipRect);
+        console.log(asteroidLocations);
+        // if (/*collision exists*/) {
+        //   crash(this.void);
+        // }
     }
 
 
