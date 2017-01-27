@@ -1,11 +1,12 @@
 (function gameSetup() {
     'use strict';
 
-    var viewportWidth = window.innerWidth;
-    var viewportHeight = window.innerHeight;
+    var viewportWidth = (window.innerWidth);
+    var viewportHeight = (window.innerHeight);
     console.log(viewportWidth);
     console.log(viewportHeight);
-
+    var didRight = false;
+    var didBottom = false;
 
     var shipElem = document.getElementById('ship');
 
@@ -24,6 +25,20 @@
     let shipsCurrentAngle = ship.angle;
     let shipsCurrentVelocity = ship.velocity;
 
+    //style ship based on velocity
+    function velocityShades(velocity) {
+      let initialShip = (String(50)+ "px solid blue");
+      let yellowShip = (String(50)+ "px solid yellow");
+      let redShip = (String(50)+ "px solid red");
+
+      if (ship.velocity > 6  && ship.velocity < 15 ) {
+          shipElem.style.borderBottom = yellowShip;
+      } else if (ship.velocity > 16 && ship.velocity < 25 ) {
+          shipElem.style.borderBottom = redShip;
+      } else if (ship.velocity < 6) {
+          shipElem.style.borderBottom = initialShip;
+      }
+    };
 
     var allAsteroids = [];
     shipElem.addEventListener('asteroidDetected', function (event) {
@@ -104,47 +119,38 @@
         // increment move top and move left for smooth moving across screen
         // access to top and left are through getShipMovement which is stored in move
         ship.top += move.top; // ship.top = ship.top + move.top;
-        ship.left += move.left; // ship.left = ship.left + move.left;
+        ship.left += move.left; // ship.left = ship.left + move.left
 
+        //change didRight and didBottom booleans to dicate += or -= movements
+
+        // if (didRight === false) {
+        //   ship.top += move.top; // ship.top = ship.top + move.top;
+        //   ship.left += move.left; // ship.left = ship.left + move.left
+        // } else {
+        //   ship.top += move.top; // ship.top = ship.top + move.top;
+        //   ship.left -= move.left; // ship.left = ship.left + move.left
+        // }
+        //
+        // if (didBottom === false) {
+        //   ship.top += move.top; // ship.top = ship.top + move.top;
+        //   ship.left += move.left; // ship.left = ship.left + move.left
+        // } else {
+        //   ship.top -= move.top; // ship.top = ship.top + move.top;
+        //   ship.left += move.left; // ship.left = ship.left + move.left
+        // }
         // have to turn ship  angle, top, and left into strings to allow styling for the elem
         // set properties for style and place in variables for easy use
         let rotateAngle = 'rotate(' + String(ship.angle) + 'deg)';
         let moveTop = (String(-ship.top) + "px"); // needs to be negative to move in right direction
         let moveLeft = (String(ship.left) + "px");
-
         // access elem & set properties equal to variables created above
         ship.elem.style.transform = rotateAngle;
         ship.elem.style.top = moveTop;
         ship.elem.style.left = moveLeft;
 
-
-        //screen wrapping
-
-        // function getTheStyle() {
-        //     let computedTop = ship.top;
-        //     let computedLeft = ship.left;
-        //
-        //     computedTop = window.getComputedStyle(ship.elem, null);
-        //     computedLeft = window.getComputedStyle(ship.elem, null);
-        //
-        //     return computedTop, computedLeft;
-        // }
-        //
-        // getTheStyle();
-
-        // console.log(ship.top);
-        // console.log(ship.left);
-
-
-
-
-
-
-
-
-
         // Time to check for any collisions (see below)...
         checkForCollisions();
+        velocityShades();
     }
 
     /**
@@ -178,6 +184,29 @@
           ship.velocity = 0; // stops the velocity (resets back to 0)
           crash(asteroid); // crash method called
         }
+
+        if (shipRect.right > viewportWidth) {
+          ship.elem.style.left = (String(0) + "px");//if any part of shipRect passes the outer edge of window, reset to 0
+          ship.left = 0;
+          getShipMovement();
+        }
+        if (shipRect.right < 0) {
+          ship.elem.style.left = (String(viewportWidth - 50) + "px"); //the 50px is required to ensure that the ENTIRE size of the div (50px border included) is part of the ship reset
+          ship.left = (viewportWidth - 50);//this is the ship reset which will get caught is if/else loop without the -50
+          getShipMovement();
+        }
+        if (shipRect.top > viewportHeight) {
+          ship.elem.style.top = (String(0) + "px");//if any part of shipRect passes the top edge of window, reset to 0
+          ship.top = 0;
+          getShipMovement();
+        }
+        // if (shipRect.top < -20) {
+        //   ship.elem.style.top = (String(viewportHeight - 50) + "px");//if any part of shipRect passes the outer edge of window, reset to 0
+        //   ship.top = (viewportHeight - 50);
+        //   getShipMovement();
+        // }
+
+
       });
 
     }
@@ -192,9 +221,28 @@
         console.log('A crash occurred!');
 
         // What might you need/want to do in here?
-        alert ("Game Over!!!!!");
-        document.location.reload();
+        allAsteroids.forEach(function(asteroid) {
+                  asteroid.style.display = "none"; // remove all asteriods from screen after crash
+                });
 
+        let heading = document.createElement("H1"); // create h1 element
+        let btn = document.createElement("BUTTON");
+        let btnText = document.createTextNode('Play Again');
+        btn.appendChild(btnText);
+        let button = document.querySelector("main").appendChild(btn);
+        let text = document.createTextNode("Game Over"); // create game over text
+        heading.appendChild(text); // append text to h1
+        let gameOver = document.querySelector("main").appendChild(heading); // set gameover equal to main and append the heading
+        gameOver.style.color = "#FF0000";
+        gameOver.style.fontSize = "8rem";
+        gameOver.style.textAlign = "center";
+        // gameOver.style.marginTop = "30vh"; // could be in pixels, rem, viewport height
+        button.style.color = "blue";
+
+        //activate reset on button click
+        var btnReset = document.querySelector('BUTTON').addEventListener('click', () => {
+                       location.reload();
+               });
     });
 
 
@@ -235,7 +283,7 @@
     function getShipMovement(velocity, angle) {
         return {
             left: (velocity * Math.sin(angle * Math.PI / 180)),
-            top: (velocity * Math.cos(angle * Math.PI / 180))
+            top: (velocity * Math.cos(angle * Math.PI / 180)),
         };
     }
 
