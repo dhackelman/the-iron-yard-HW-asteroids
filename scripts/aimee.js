@@ -7,8 +7,7 @@
     console.log(viewportHeight);
 
     var shipElem = document.getElementById('ship');
-    let seconds = null;
-    let clocking = true;
+
     let cbi = -15; //create index type variable that creat cannonball and movecannonball can both access
     // Create your "ship" object and any other variables you might need..
     const ship = {
@@ -230,25 +229,26 @@
                 crash(asteroid); // crash method called
             }
 
+            //screen-wrapping
             if (shipRect.right > viewportWidth) { //right
                 //   ship.elem.style.left = (String(0) + "px"); // if any part of shipRect passes the outer edge of window, reset to 0
                 ship.left = 0;
-                getShipMovement();
+                // getShipMovement();
             }
             if (shipRect.right < 0) { // left
                 //   ship.elem.style.left = (String(viewportWidth - 50) + "px"); //the 50px is required to ensure that the ENTIRE size of the div (50px border included) is part of the ship reset
                 ship.left = (viewportWidth - 50); //this is the ship reset which will get caught is if/else loop without the -50
-                getShipMovement();
+                // getShipMovement();
             }
             if (shipRect.top > viewportHeight) { // bottom
                 // ship.elem.style.top = (String(viewportHeight - 50) + "px"); // if any part of the shipRect passes the outer edge of window, reset to 0
                 ship.top = 0;
-                getShipMovement();
+                // getShipMovement();
             }
             if (shipRect.top < -50) { // top
                 // ship.elem.style.top = (String(viewportHeight - 50) + "px"); // if any part of the shipRect passes the outer edge of window, reset to 0
                 ship.top = (viewportHeight - (viewportHeight / .5)); //this is a more dynamic way to make sure that we always popup on the bottom edge and not randomly in the middle of the screen
-                getShipMovement();
+                // getShipMovement();
             }
         });
 
